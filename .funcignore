@@ -5,6 +5,7 @@
 local.settings.json
 test
 .nyc_output
+node_modules/
 node_modules/@azure/functions-core-tools
 .env
 README.md
