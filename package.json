@@ -1,0 +1,19 @@
+{
+  "name": "azure-functions-sample",
+  "version": "1.0.0",
+  "description": "Simple Azure Functions sample with hello and status endpoints",
+  "main": "index.js",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "start": "func start",
+    "test": "echo \"No tests specified - skipping\" && exit 0"
+  },
+  "dependencies": {
+    "@azure/functions": "^4.5.0"
+  },
+  "devDependencies": {
+    "azure-functions-core-tools": "^4.0.0"
+  }
+}
