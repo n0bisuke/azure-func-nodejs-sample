@@ -8,7 +8,8 @@
   },
   "scripts": {
     "start": "func start",
-    "test": "echo \"No tests specified - skipping\" && exit 0"
+    "test": "echo \"No tests specified - skipping\" && exit 0",
+    "build": "npm ci --omit=dev"
   },
   "dependencies": {
     "@azure/functions": "^4.5.0"
