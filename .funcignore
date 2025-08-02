@@ -1,0 +1,60 @@
+# Azure Functions deployment ignore file
+
+# Node.js modules
+node_modules/
+
+# Development files
+.git/
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Log files
+*.log
+logs/
+
+# Temporary files
+tmp/
+temp/
+
+# Environment files
+.env*
+
+# Local settings
+local.settings.json
+
+# Documentation
+README.md
+*.md
+
+# Git files
+.gitignore
+
+# npm cache
+.npm/
+
+# Coverage reports
+coverage/
+
+# Test files
+test/
+tests/
+*.test.js
+*.spec.js
+
+# Azure Functions Core Tools cache
+.azurefunctions/
+
+# Package lock (reduce size)
+package-lock.json
+
+# TypeScript source (if any)
+src/
+*.ts
+tsconfig.json
+
+# Development dependencies (will be excluded from production build)
+# These will be handled by npm ci --omit=dev during build
