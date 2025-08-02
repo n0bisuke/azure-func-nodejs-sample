@@ -1,56 +1,56 @@
 # Azure Functions Simple Sample
 
-Azure Functions v4 の基本的な使い方を学ぶためのシンプルなサンプルプロジェクトです。
+This is a simple sample project to learn the basics of Azure Functions v4.
 
-## 概要
+## Overview
 
-このサンプルでは以下の2つのエンドポイントを提供します：
-- `GET /api/hello` - シンプルなテキストレスポンス
-- `GET /api/status` - システム情報をJSON形式で返却
+This sample provides the following two endpoints:
+- `GET /api/hello` - Returns a simple text response
+- `GET /api/status` - Returns system information as JSON
 
-## 前提条件
+## Prerequisites
 
 - Node.js 18.x - 22.x
 - Azure Functions Core Tools v4
 
-## セットアップ
+## Setup
 
-1. **依存関係のインストール**
+1. **Install dependencies**
    ```bash
    cd sample
    npm install
    ```
 
-2. **Azure Functions Core Tools のインストール（未インストールの場合）**
+2. **Install Azure Functions Core Tools (if not already installed)**
    ```bash
    npm install -g azure-functions-core-tools@4 --unsafe-perm true
    ```
 
-## ローカル開発
+## Local Development
 
-1. **開発サーバーの起動**
+1. **Start the development server**
    ```bash
    npm start
-   # または
+   # or
    func start
    ```
 
-2. **動作確認**
-   ブラウザで以下のURLにアクセス：
+2. **Check if it's working**
+   Open the following URLs in your browser:
    - http://localhost:7071/api/hello
    - http://localhost:7071/api/status
 
-## エンドポイント詳細
+## Endpoint Details
 
 ### GET /api/hello
-- **説明**: シンプルなhelloメッセージを返却
-- **レスポンス**: テキスト形式
-- **例**: `Hello from Azure Functions Sample!`
+- **Description**: Returns a simple hello message
+- **Response**: Plain text
+- **Example**: `Hello from Azure Functions Sample!`
 
 ### GET /api/status
-- **説明**: システム状態とメタ情報をJSON形式で返却
-- **レスポンス**: JSON形式
-- **例**:
+- **Description**: Returns system status and meta information in JSON format
+- **Response**: JSON
+- **Example**:
   ```json
   {
     "message": "Azure Functions Sample is running",
@@ -63,62 +63,61 @@ Azure Functions v4 の基本的な使い方を学ぶためのシンプルなサ�
   }
   ```
 
-## ファイル構成
+## File Structure
 
 ```
 sample/
-├── package.json          # プロジェクト設定
-├── host.json             # Azure Functions設定
-├── local.settings.json   # ローカル開発設定
-├── index.js              # メインの Function定義
-└── README.md             # このファイル
+├── package.json          # Project configuration
+├── host.json             # Azure Functions configuration
+├── local.settings.json   # Local development settings
+├── index.js              # Main function definition
+└── README.md             # This file
 ```
 
-## 学習ポイント
+## Learning Points
 
-このサンプルから学べる内容：
+What you can learn from this sample:
 
-1. **Azure Functions の基本構造**
-   - `app.setup()` によるセットアップ
-   - `app.http()` による HTTP エンドポイント定義
+1. **Basic structure of Azure Functions**
+   - Setup using `app.setup()`
+   - Define HTTP endpoints with `app.http()`
 
-2. **エンドポイント設定**
-   - `methods`: HTTP メソッド指定
-   - `authLevel`: 認証レベル設定
-   - `route`: ルート設定
+2. **Endpoint configuration**
+   - `methods`: Specify HTTP methods
+   - `authLevel`: Set authentication level
+   - `route`: Route settings
 
-3. **レスポンス処理**
-   - テキストレスポンス
-   - JSONレスポンス（適切なContent-Typeヘッダー設定）
+3. **Response handling**
+   - Text response
+   - JSON response (with appropriate Content-Type headers)
 
-4. **ログ出力**
-   - `context.log()` によるログ記録
+4. **Logging**
+   - Use `context.log()` to log messages
 
-## 次のステップ
+## Next Steps
 
-このサンプルを理解したら、以下の機能を追加してみてください：
+After understanding this sample, try adding the following features:
 
-- POST エンドポイントの追加
-- リクエストボディの処理
-- 環境変数の使用
-- エラーハンドリングの強化
+- Add a POST endpoint
+- Handle request bodies
+- Use environment variables
+- Enhance error handling
 
-## トラブルシューティング
+## Troubleshooting
 
-### Node.js バージョンエラー
+### Node.js version error
 ```
 Incompatible Node.js version (v24.x.x)
 ```
-Node.js v18-22にダウングレードしてください。
+Please downgrade to Node.js v18-22.
 
-### 関数が認識されない
-- `package.json` と `host.json` の設定を確認
-- `npm install` で依存関係を再インストール
+### Function not recognized
+- Check your `package.json` and `host.json` configuration
+- Reinstall dependencies with `npm install`
 
+## Deployment Sample
 
-## デプロイサンプル情報
-
-- GitHub Actionsでデプロイする際のサンプルYML
+- Example YAML for deploying with GitHub Actions
 
 ```.github/workflows/deploy.yml
 # Docs for the Azure Web Apps Deploy action: https://github.com/azure/functions-action

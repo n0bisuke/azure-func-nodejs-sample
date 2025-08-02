@@ -1,36 +1,36 @@
-# Azure Functions + Node.js 開発グランドルール
+# Grand Rules for Azure Functions + Node.js Development
 
-## 新しいAIアシスタントへの引き継ぎ事項
+## Handover Notes for New AI Assistants
 
-このドキュメントは、Azure Functions + Node.js プロジェクトで他のAIが作業する際の重要なガイドラインです。Discord Bot から Azure Functions への移行プロジェクトで得られた知見をまとめています。
+This document outlines key guidelines for working on Azure Functions + Node.js projects, especially when transitioning tasks to other AI agents. It consolidates insights gained from migrating from a Discord Bot to Azure Functions.
 
-## 1. Node.js バージョン制約（最重要）
+## 1. Node.js Version Restrictions (Most Important)
 
 ```bash
-# ✅ 対応バージョン
+# ✅ Supported Versions
 Node.js 18.x - 22.x
 
-# ❌ 非対応バージョン  
-Node.js 24.x (Azure Functions Core Tools未対応)
+# ❌ Unsupported Version  
+Node.js 24.x (Not supported by Azure Functions Core Tools)
 ```
 
-**症状と対処法:**
-- エラー: `Incompatible Node.js version (v24.x.x)`
-- 対処: `nodebrew use v22` または `nvm use 22` でダウングレード
-- 確認: `node -v` でバージョン確認必須
+**Symptoms & Solutions:**
+- Error: `Incompatible Node.js version (v24.x.x)`
+- Solution: Downgrade with `nodebrew use v22` or `nvm use 22`
+- Check: Always confirm with `node -v`
 
-## 2. package.json 必須構成
+## 2. Required package.json Structure
 
-**成功パターン:**
+**Successful Example:**
 ```json
 {
-  "main": "index.js",           // エントリーポイント必須
+  "main": "index.js",           // Entry point is required
   "engines": {
-    "node": ">=22.0.0"          // バージョン制約明記
+    "node": ">=22.0.0"          // Specify Node.js version
   },
   "scripts": {
     "start": "func start",
-    "test": "echo \"No tests specified - skipping\" && exit 0"  // exit 0必須
+    "test": "echo \"No tests specified - skipping\" && exit 0"  // exit 0 is required
   },
   "dependencies": {
     "@azure/functions": "^4.5.0"
@@ -38,14 +38,14 @@ Node.js 24.x (Azure Functions Core Tools未対応)
 }
 ```
 
-**失敗パターンと対処:**
-- `"test": "exit 1"` → GitHub Actions デプロイ失敗
-- `"main"` フィールド未記載 → Function runtime エラー
-- engines 未指定 → バージョン競合
+**Common Issues & Fixes:**
+- `"test": "exit 1"` → Will cause GitHub Actions deploy to fail
+- Missing `"main"` field → Function runtime error
+- No engines specified → Version conflicts
 
-## 3. host.json 最適化パターン
+## 3. Recommended host.json Pattern
 
-**成功パターン:**
+**Successful Example:**
 ```json
 {
   "version": "2.0",
@@ -68,135 +68,135 @@ Node.js 24.x (Azure Functions Core Tools未対応)
 }
 ```
 
-**避けるべき設定:**
+**Settings to Avoid:**
 ```json
 {
-  "customHandler": {  // ← 不要な場合は削除
+  "customHandler": {  // ← Remove if unnecessary
     "description": {...}
   }
 }
 ```
 
-## 4. デプロイ失敗パターンと解決法
+## 4. Common Deployment Failure Patterns & Solutions
 
-### パターン1: HTTP Worker timeout
-- **症状**: `Host thresholds exceeded` エラー
-- **原因**: index.js が見つからない、app.setup() 未実行
-- **解決**: package.json の "main" フィールド確認
+### Pattern 1: HTTP Worker Timeout
+- **Symptom**: `Host thresholds exceeded` error
+- **Cause**: index.js not found, or app.setup() not executed
+- **Solution**: Check "main" field in package.json
 
-### パターン2: npm test 失敗でデプロイ中断
-- **症状**: GitHub Actions で `npm test` が exit 1
-- **解決**: test script を `exit 0` に変更
+### Pattern 2: npm test Fails and Stops Deployment
+- **Symptom**: `npm test` returns exit 1 in GitHub Actions
+- **Solution**: Change test script to `exit 0`
 
-### パターン3: ZipDeploy Internal Server Error
-- **症状**: Azure へのアップロード時 500 エラー
-- **解決**: .funcignore でファイルサイズ削減
+### Pattern 3: ZipDeploy Internal Server Error
+- **Symptom**: 500 error during upload to Azure
+- **Solution**: Reduce file size using .funcignore
 
-### パターン4: Module not found
-- **症状**: `Cannot find module './index'`
-- **解決**: package.json の main フィールドとファイル名一致確認
+### Pattern 4: Module Not Found
+- **Symptom**: `Cannot find module './index'`
+- **Solution**: Ensure main field in package.json matches file name
 
-## 5. ファイル構成の制約
+## 5. File Structure Requirements
 
-**単一ファイル構成（推奨）:**
+**Single File Structure (Recommended):**
 ```
-index.js          # 全エンドポイント定義
+index.js          # Defines all endpoints
 libs/
-  discord.js      # 共通ライブラリ
+  discord.js      # Shared libraries
   teams.js
 package.json
 host.json
 ```
 
-**複数ファイル構成（注意）:**
-- `src/functions/` 分割は Azure Functions の検出に問題が生じる場合あり
-- 分割時は host.json、package.json の再確認必須
-- 「まずはさっきの動く状態 ファイルを分割する前に戻しつつ」のユーザーコメント通り、動作確認後に分割
+**Multiple File Structure (Caution):**
+- Splitting into `src/functions/` can cause detection issues with Azure Functions
+- When splitting, always double-check host.json and package.json
+- As per user comments, **return to a working single-file state before splitting**, confirm it works, then proceed to refactor
 
-## 6. 必須の事前チェック項目
+## 6. Pre-deployment Checklist
 
-デプロイ前に以下を確認:
+Before deploying, confirm the following:
 ```bash
-# 1. Node.js バージョン確認
-node -v  # 18.x-22.x であること
+# 1. Check Node.js version
+node -v  # Must be 18.x-22.x
 
-# 2. ローカル動作確認
-npm start  # func start のエイリアス
-curl http://localhost:7071/api/hello  # レスポンス確認
+# 2. Local run test
+npm start  # Alias for func start
+curl http://localhost:7071/api/hello  # Check response
 
-# 3. package.json 構文確認  
-npm install  # エラーが出ないこと
+# 3. Validate package.json syntax  
+npm install  # Ensure no errors
 
-# 4. 関数定義確認
-# app.http() が正しく定義されていること
-# app.setup() が実行されていること
+# 4. Function definitions check
+# Ensure app.http() is properly defined
+# Ensure app.setup() is executed
 ```
 
-## 7. エラー発生時のデバッグ手順
+## 7. Debugging Steps When Errors Occur
 
-### 段階的デバッグアプローチ
-1. **Azure Portal でログ確認**
+### Step-by-Step Debug Approach
+1. **Check Logs in Azure Portal**
    - Function App → Monitor → Live Metrics
-   - Log Stream で実時間ログ確認
+   - Real-time logs via Log Stream
 
-2. **ローカル再現**
-   - `npm start` で同じエラーが出るか確認
-   - curl でエンドポイントテスト
+2. **Reproduce Locally**
+   - Use `npm start` to check for the same error
+   - Test endpoint with curl
 
-3. **設定ファイル見直し**
-   - package.json の main, scripts, engines
-   - host.json の extensionBundle
-   - index.js の app.setup() 実行確認
+3. **Review Config Files**
+   - Check main, scripts, and engines in package.json
+   - extensionBundle in host.json
+   - Ensure app.setup() runs in index.js
 
-4. **段階的デプロイ**
-   - 最小構成で成功確認
-   - 機能を段階的に追加
+4. **Deploy in Stages**
+   - Start with minimal working configuration
+   - Gradually add features
 
-### 典型的なエラーメッセージと対処
-- `context.log.error is not a function` → `context.error()` に修正
-- `Cannot read properties of undefined (reading 'body')` → webhook_body 全体を渡す
-- `プログラムではなくhost.jsonなどほかの部分もチェック` → 設定ファイル見直し
+### Typical Error Messages & Fixes
+- `context.log.error is not a function` → Use `context.error()` instead
+- `Cannot read properties of undefined (reading 'body')` → Pass the entire webhook_body
+- `Check not only the program but also config files like host.json` → Revisit configuration files
 
-## 8. 成功した最終構成
+## 8. Final Working Configuration (Proven Success)
 
-この構成で確実にデプロイできることを確認済み:
+The following setup is confirmed to deploy successfully:
 - **Node.js**: v22.x
 - **package.json**: main="index.js", test exit 0
-- **host.json**: シンプルな構成（customHandler なし）
-- **index.js**: app.setup() + 3つのエンドポイント
-- **libs/**: discord.js, teams.js での機能分離
+- **host.json**: Simple config (no customHandler)
+- **index.js**: app.setup() + 3 endpoints
+- **libs/**: Separate features in discord.js, teams.js
 
-## 9. Azure Functions Core Tools 使用上の注意
+## 9. Notes on Using Azure Functions Core Tools
 
 ```bash
-# ✅ 正しい起動方法
-npm start  # package.json で "start": "func start" 定義済み
+# ✅ Correct Way to Start
+npm start  # "start": "func start" defined in package.json
 
-# ❌ 直接実行は避ける
-func start  # npm script 経由を推奨
+# ❌ Avoid direct execution
+func start  # Prefer running via npm script
 ```
 
-## 10. GitHub Actions CI/CD での注意点
+## 10. Points to Note for GitHub Actions CI/CD
 
-- **test script**: `exit 0` でないとデプロイ失敗
-- **Node.js バージョン**: Actions でも 18.x-22.x 指定
-- **デプロイ成功の確認**: ログで「デプロイがうまくいきました！」確認
+- **test script**: Must return `exit 0` or deployment will fail
+- **Node.js version**: Set to 18.x-22.x in Actions too
+- **Confirm Deployment Success**: Look for log message "Deployment successful!"
 
-## 11. 今後の作業時の注意点
+## 11. Points for Future Work
 
-- **ファイル分割は慎重に**: 動作確認してから実施
-- **バージョン更新は段階的に**: Node.js, Azure Functions バージョン
-- **デプロイ前にローカル確認**: エラーの早期発見
-- **設定変更は最小限**: 動く構成をベースに小さく変更
-- **問題発生時は基本に戻る**: シンプル構成から段階的に拡張
+- **Be cautious when splitting files**: Always verify functionality first
+- **Update versions gradually**: Node.js and Azure Functions versions
+- **Test locally before deploying**: Catch errors early
+- **Minimize configuration changes**: Start from a working baseline and modify in small steps
+- **Return to basics if problems occur**: Expand gradually from a minimal, working setup
 
-## 12. 参考情報
+## 12. References
 
-- Azure Functions Node.js v4 プログラミングモデル
-- GitHub Webhook処理パターン
-- Discord/Teams Webhook 送信仕様
-- プロトアウト社内システム連携仕様
+- Azure Functions Node.js v4 Programming Model
+- GitHub Webhook Processing Patterns
+- Discord/Teams Webhook Sending Specs
+- ProtoOut Internal System Integration Specs
 
 ---
 
-**最重要**: このガイドラインは実際のトラブルシューティング経験に基づいています。新しい問題が発生した場合は、このドキュメントを更新してください。
+**Most Important**: This guideline is based on real troubleshooting experience. If you encounter new issues, please update this document.
