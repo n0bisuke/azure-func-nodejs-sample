@@ -3,6 +3,7 @@ const { app } = require('@azure/functions');
 // Azure Functions セットアップ
 app.setup({});
 
+
 // Hello エンドポイント
 app.http('hello', {
     methods: ['GET'],
